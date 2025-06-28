@@ -10,18 +10,21 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
 #include <QtGui/QIcon>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QFrame>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets/QSplitter>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QStatusBar>
 #include <QtWidgets/QToolButton>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -29,24 +32,28 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
-    QAction *action514;
     QWidget *centralwidget;
-    QFrame *Dock;
+    QHBoxLayout *mainLayout;
+    QVBoxLayout *dockLayout;
     QScrollArea *scrollArea;
     QWidget *scrollAreaWidgetContents;
+    QSplitter *mainSplitter;
     QStackedWidget *SideBar;
     QWidget *page;
     QWidget *page_2;
-    QFrame *line;
-    QPlainTextEdit *Content;
-    QFrame *ToolBar;
+    QWidget *ContentContainer;
+    QVBoxLayout *rightVBox;
+    QHBoxLayout *toolBarLayout;
     QToolButton *UndoBtn;
     QToolButton *RedoBtn;
     QToolButton *CopyBtn;
     QToolButton *CutBtn;
     QToolButton *PasteBtn;
     QToolButton *FindBtn;
+    QSpacerItem *ToolBarSpacer;
     QLabel *label;
+    QFrame *hLine;
+    QPlainTextEdit *Content;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -55,32 +62,33 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(960, 540);
-        MainWindow->setMinimumSize(QSize(960, 540));
-        MainWindow->setMaximumSize(QSize(960, 16777215));
-        action514 = new QAction(MainWindow);
-        action514->setObjectName("action514");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
-        Dock = new QFrame(centralwidget);
-        Dock->setObjectName("Dock");
-        Dock->setGeometry(QRect(0, 0, 96, 480));
-        Dock->setMinimumSize(QSize(96, 480));
-        Dock->setFrameShape(QFrame::StyledPanel);
-        Dock->setFrameShadow(QFrame::Raised);
-        scrollArea = new QScrollArea(Dock);
+        mainLayout = new QHBoxLayout(centralwidget);
+        mainLayout->setObjectName("mainLayout");
+        dockLayout = new QVBoxLayout();
+        dockLayout->setSpacing(0);
+        dockLayout->setObjectName("dockLayout");
+        scrollArea = new QScrollArea(centralwidget);
         scrollArea->setObjectName("scrollArea");
-        scrollArea->setGeometry(QRect(0, 0, 96, 81));
-        scrollArea->setMinimumSize(QSize(96, 0));
-        scrollArea->setMaximumSize(QSize(96, 16777215));
+        scrollArea->setFrameShape(QFrame::NoFrame);
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 94, 79));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 94, 463));
         scrollArea->setWidget(scrollAreaWidgetContents);
-        SideBar = new QStackedWidget(centralwidget);
+
+        dockLayout->addWidget(scrollArea);
+
+
+        mainLayout->addLayout(dockLayout);
+
+        mainSplitter = new QSplitter(centralwidget);
+        mainSplitter->setObjectName("mainSplitter");
+        mainSplitter->setOrientation(Qt::Horizontal);
+        SideBar = new QStackedWidget(mainSplitter);
         SideBar->setObjectName("SideBar");
-        SideBar->setGeometry(QRect(100, 0, 200, 480));
-        SideBar->setMinimumSize(QSize(200, 480));
+        SideBar->setMinimumSize(QSize(200, 0));
         SideBar->setMaximumSize(QSize(400, 16777215));
         page = new QWidget();
         page->setObjectName("page");
@@ -88,52 +96,106 @@ public:
         page_2 = new QWidget();
         page_2->setObjectName("page_2");
         SideBar->addWidget(page_2);
-        line = new QFrame(centralwidget);
-        line->setObjectName("line");
-        line->setGeometry(QRect(290, 0, 16, 491));
-        line->setFrameShape(QFrame::VLine);
-        line->setFrameShadow(QFrame::Sunken);
-        Content = new QPlainTextEdit(centralwidget);
-        Content->setObjectName("Content");
-        Content->setGeometry(QRect(300, 30, 661, 461));
-        ToolBar = new QFrame(centralwidget);
-        ToolBar->setObjectName("ToolBar");
-        ToolBar->setGeometry(QRect(300, 0, 661, 31));
-        ToolBar->setFrameShape(QFrame::StyledPanel);
-        ToolBar->setFrameShadow(QFrame::Raised);
-        UndoBtn = new QToolButton(ToolBar);
+        mainSplitter->addWidget(SideBar);
+        ContentContainer = new QWidget(mainSplitter);
+        ContentContainer->setObjectName("ContentContainer");
+        rightVBox = new QVBoxLayout(ContentContainer);
+        rightVBox->setSpacing(0);
+        rightVBox->setObjectName("rightVBox");
+        rightVBox->setContentsMargins(0, 0, 0, 0);
+        toolBarLayout = new QHBoxLayout();
+        toolBarLayout->setObjectName("toolBarLayout");
+        UndoBtn = new QToolButton(ContentContainer);
         UndoBtn->setObjectName("UndoBtn");
-        UndoBtn->setGeometry(QRect(0, 0, 32, 32));
-        QIcon icon(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditUndo")));
+        UndoBtn->setMinimumSize(QSize(32, 0));
+        UndoBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icons/Undo.svg"), QSize(), QIcon::Normal, QIcon::Off);
         UndoBtn->setIcon(icon);
-        RedoBtn = new QToolButton(ToolBar);
+        UndoBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(UndoBtn);
+
+        RedoBtn = new QToolButton(ContentContainer);
         RedoBtn->setObjectName("RedoBtn");
-        RedoBtn->setGeometry(QRect(32, 0, 32, 32));
-        QIcon icon1(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditRedo")));
+        RedoBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8("res/icons/Redo.svg"), QSize(), QIcon::Normal, QIcon::Off);
         RedoBtn->setIcon(icon1);
-        CopyBtn = new QToolButton(ToolBar);
+        RedoBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(RedoBtn);
+
+        CopyBtn = new QToolButton(ContentContainer);
         CopyBtn->setObjectName("CopyBtn");
-        CopyBtn->setGeometry(QRect(64, 0, 32, 32));
-        QIcon icon2(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditCopy")));
+        CopyBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8("res/icons/Copy.svg"), QSize(), QIcon::Normal, QIcon::Off);
         CopyBtn->setIcon(icon2);
-        CutBtn = new QToolButton(ToolBar);
+        CopyBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(CopyBtn);
+
+        CutBtn = new QToolButton(ContentContainer);
         CutBtn->setObjectName("CutBtn");
-        CutBtn->setGeometry(QRect(96, 0, 32, 32));
-        QIcon icon3(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditCut")));
+        CutBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8("res/icons/Cut.svg"), QSize(), QIcon::Normal, QIcon::Off);
         CutBtn->setIcon(icon3);
-        PasteBtn = new QToolButton(ToolBar);
+        CutBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(CutBtn);
+
+        PasteBtn = new QToolButton(ContentContainer);
         PasteBtn->setObjectName("PasteBtn");
-        PasteBtn->setGeometry(QRect(128, 0, 32, 32));
-        QIcon icon4(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditPaste")));
+        PasteBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/res/icons/Paste.svg"), QSize(), QIcon::Normal, QIcon::Off);
         PasteBtn->setIcon(icon4);
-        FindBtn = new QToolButton(ToolBar);
+        PasteBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(PasteBtn);
+
+        FindBtn = new QToolButton(ContentContainer);
         FindBtn->setObjectName("FindBtn");
-        FindBtn->setGeometry(QRect(160, 0, 32, 32));
-        QIcon icon5(QIcon::fromTheme(QString::fromUtf8("QIcon::ThemeIcon::EditFind")));
+        FindBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/res/icons/Find.svg"), QSize(), QIcon::Normal, QIcon::Off);
         FindBtn->setIcon(icon5);
-        label = new QLabel(ToolBar);
+        FindBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(FindBtn);
+
+        ToolBarSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        toolBarLayout->addItem(ToolBarSpacer);
+
+        label = new QLabel(ContentContainer);
         label->setObjectName("label");
-        label->setGeometry(QRect(224, 0, 256, 32));
+        label->setMinimumSize(QSize(0, 32));
+
+        toolBarLayout->addWidget(label);
+
+
+        rightVBox->addLayout(toolBarLayout);
+
+        hLine = new QFrame(ContentContainer);
+        hLine->setObjectName("hLine");
+        hLine->setFrameShape(QFrame::HLine);
+        hLine->setFrameShadow(QFrame::Sunken);
+
+        rightVBox->addWidget(hLine);
+
+        Content = new QPlainTextEdit(ContentContainer);
+        Content->setObjectName("Content");
+
+        rightVBox->addWidget(Content);
+
+        mainSplitter->addWidget(ContentContainer);
+
+        mainLayout->addWidget(mainSplitter);
+
+        mainLayout->setStretch(1, 1);
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -151,13 +213,6 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        action514->setText(QCoreApplication::translate("MainWindow", "514", nullptr));
-        UndoBtn->setText(QString());
-        RedoBtn->setText(QString());
-        CopyBtn->setText(QString());
-        CutBtn->setText(QString());
-        PasteBtn->setText(QString());
-        FindBtn->setText(QString());
         label->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
     } // retranslateUi
 

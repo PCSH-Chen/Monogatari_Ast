@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/icons/Copy.svg</file>
+        <file>res/icons/Cut.svg</file>
+        <file>res/icons/Find.svg</file>
+        <file>res/icons/Paste.svg</file>
+        <file>res/icons/Redo.svg</file>
+        <file>res/icons/Undo.svg</file>
+    </qresource>
+</RCC>

@@ -53,9 +53,11 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../main.cpp \
-		../../mainwindow.cpp moc_mainwindow.cpp
+		../../mainwindow.cpp qrc_icons.cpp \
+		moc_mainwindow.cpp
 OBJECTS       = main.o \
 		mainwindow.o \
+		qrc_icons.o \
 		moc_mainwindow.o
 DIST          = /Qt/6.5.3/macos/mkspecs/features/spec_pre.prf \
 		/Qt/6.5.3/macos/mkspecs/features/device_config.prf \
@@ -640,6 +642,7 @@ Makefile: ../../MonogatariAshisutando.pro ../../../Qt/6.5.3/macos/mkspecs/featur
 		../../../Qt/6.5.3/macos/mkspecs/features/yacc.prf \
 		../../../Qt/6.5.3/macos/mkspecs/features/lex.prf \
 		../../MonogatariAshisutando.pro \
+		../../icons.qrc \
 		../../../Qt/6.5.3/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl \
 		../../../Qt/6.5.3/macos/lib/QtGui.framework/Resources/QtGui.prl \
 		../../../Qt/6.5.3/macos/lib/QtCore.framework/Resources/QtCore.prl
@@ -923,6 +926,7 @@ Makefile: ../../MonogatariAshisutando.pro ../../../Qt/6.5.3/macos/mkspecs/featur
 ../../../Qt/6.5.3/macos/mkspecs/features/yacc.prf:
 ../../../Qt/6.5.3/macos/mkspecs/features/lex.prf:
 ../../MonogatariAshisutando.pro:
+../../icons.qrc:
 ../../../Qt/6.5.3/macos/lib/QtWidgets.framework/Resources/QtWidgets.prl:
 ../../../Qt/6.5.3/macos/lib/QtGui.framework/Resources/QtGui.prl:
 ../../../Qt/6.5.3/macos/lib/QtCore.framework/Resources/QtCore.prl:
@@ -950,6 +954,7 @@ dist: distdir FORCE
 distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
+	$(COPY_FILE) --parents ../../icons.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../../main.cpp ../../mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
@@ -979,8 +984,19 @@ check: first
 
 benchmark: first
 
-compiler_rcc_make_all:
+compiler_rcc_make_all: qrc_icons.cpp
 compiler_rcc_clean:
+	-$(DEL_FILE) qrc_icons.cpp
+qrc_icons.cpp: ../../icons.qrc \
+		../../../Qt/6.5.3/macos/libexec/rcc \
+		../../res/icons/Redo.svg \
+		../../res/icons/Find.svg \
+		../../res/icons/Undo.svg \
+		../../res/icons/Paste.svg \
+		../../res/icons/Cut.svg \
+		../../res/icons/Copy.svg
+	/Users/heyairu/Qt/6.5.3/macos/libexec/rcc -name icons --no-zstd ../../icons.qrc -o qrc_icons.cpp
+
 compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
 	-$(DEL_FILE) moc_mainwindow.cpp
@@ -1009,7 +1025,7 @@ compiler_yacc_impl_make_all:
 compiler_yacc_impl_clean:
 compiler_lex_make_all:
 compiler_lex_clean:
-compiler_clean: compiler_moc_header_clean compiler_uic_clean 
+compiler_clean: compiler_rcc_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
 
@@ -1025,6 +1041,9 @@ mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
 		../../../Qt/6.5.3/macos/lib/QtWidgets.framework/Headers/qmainwindow.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
+
+qrc_icons.o: qrc_icons.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_icons.o qrc_icons.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp

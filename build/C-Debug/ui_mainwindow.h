@@ -53,7 +53,7 @@ public:
     QToolButton *PasteBtn;
     QToolButton *FindBtn;
     QSpacerItem *ToolBarSpacer;
-    QLabel *label;
+    QLabel *ChapterNameLabel;
     QFrame *hLine;
     QPlainTextEdit *Content;
     QMenuBar *menubar;
@@ -64,6 +64,8 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(960, 540);
+        MainWindow->setMinimumSize(QSize(960, 540));
+        MainWindow->setTabShape(QTabWidget::Triangular);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         mainLayout = new QHBoxLayout(centralwidget);
@@ -296,11 +298,11 @@ public:
 
         toolBarLayout->addItem(ToolBarSpacer);
 
-        label = new QLabel(ContentContainer);
-        label->setObjectName("label");
-        label->setMinimumSize(QSize(0, 32));
+        ChapterNameLabel = new QLabel(ContentContainer);
+        ChapterNameLabel->setObjectName("ChapterNameLabel");
+        ChapterNameLabel->setMinimumSize(QSize(0, 32));
 
-        toolBarLayout->addWidget(label);
+        toolBarLayout->addWidget(ChapterNameLabel);
 
 
         rightVBox->addLayout(toolBarLayout);
@@ -339,7 +341,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        label->setText(QCoreApplication::translate("MainWindow", "TextLabel", nullptr));
+        ChapterNameLabel->setText(QCoreApplication::translate("MainWindow", "ChapterName", nullptr));
     } // retranslateUi
 
 };

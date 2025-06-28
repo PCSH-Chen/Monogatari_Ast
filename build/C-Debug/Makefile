@@ -993,8 +993,10 @@ qrc_icons.cpp: ../../icons.qrc \
 		../../res/icons/Find.svg \
 		../../res/icons/Undo.svg \
 		../../res/icons/Paste.svg \
+		../../res/icons/Save.svg \
 		../../res/icons/Cut.svg \
-		../../res/icons/Copy.svg
+		../../res/icons/Copy.svg \
+		../../res/icons/AllSelect.svg
 	/Users/heyairu/Qt/6.5.3/macos/libexec/rcc -name icons --no-zstd ../../icons.qrc -o qrc_icons.cpp
 
 compiler_moc_header_make_all: moc_mainwindow.cpp

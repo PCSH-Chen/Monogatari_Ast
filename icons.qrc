@@ -6,5 +6,7 @@
         <file>res/icons/Paste.svg</file>
         <file>res/icons/Redo.svg</file>
         <file>res/icons/Undo.svg</file>
+        <file>res/icons/AllSelect.svg</file>
+        <file>res/icons/Save.svg</file>
     </qresource>
 </RCC>

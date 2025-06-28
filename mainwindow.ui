@@ -33,7 +33,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>94</width>
+           <width>69</width>
            <height>463</height>
           </rect>
          </property>
@@ -71,6 +71,36 @@
         <item>
          <layout class="QHBoxLayout" name="toolBarLayout">
           <item>
+           <widget class="QToolButton" name="SaveBtn">
+            <property name="styleSheet">
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
+            </property>
+            <property name="icon">
+             <iconset resource="icons.qrc">
+              <normaloff>:/res/icons/Save.svg</normaloff>:/res/icons/Save.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QToolButton" name="UndoBtn">
             <property name="minimumSize">
              <size>
@@ -79,7 +109,20 @@
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
              <iconset resource="icons.qrc">
@@ -96,11 +139,54 @@
           <item>
            <widget class="QToolButton" name="RedoBtn">
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>res/icons/Redo.svg</normaloff>res/icons/Redo.svg</iconset>
+             <iconset resource="icons.qrc">
+              <normaloff>:/res/icons/Redo.svg</normaloff>:/res/icons/Redo.svg</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QToolButton" name="AllSelectBtn">
+            <property name="styleSheet">
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
+            </property>
+            <property name="icon">
+             <iconset resource="icons.qrc">
+              <normaloff>:/res/icons/AllSelect.svg</normaloff>:/res/icons/AllSelect.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -113,11 +199,24 @@
           <item>
            <widget class="QToolButton" name="CopyBtn">
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>res/icons/Copy.svg</normaloff>res/icons/Copy.svg</iconset>
+             <iconset resource="icons.qrc">
+              <normaloff>:/res/icons/Copy.svg</normaloff>:/res/icons/Copy.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -130,11 +229,24 @@
           <item>
            <widget class="QToolButton" name="CutBtn">
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
-             <iconset>
-              <normaloff>res/icons/Cut.svg</normaloff>res/icons/Cut.svg</iconset>
+             <iconset resource="icons.qrc">
+              <normaloff>:/res/icons/Cut.svg</normaloff>:/res/icons/Cut.svg</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -147,7 +259,20 @@
           <item>
            <widget class="QToolButton" name="PasteBtn">
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
              <iconset resource="icons.qrc">
@@ -164,7 +289,20 @@
           <item>
            <widget class="QToolButton" name="FindBtn">
             <property name="styleSheet">
-             <string notr="true">background: transparent; border: none;</string>
+             <string notr="true">
+                QToolButton {
+                    background: transparent;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 2px;
+                }
+                QToolButton:hover {
+                    background: #e0e0e0;
+                }
+                QToolButton:pressed {
+                    background: #b0b0b0;
+                }
+             </string>
             </property>
             <property name="icon">
              <iconset resource="icons.qrc">

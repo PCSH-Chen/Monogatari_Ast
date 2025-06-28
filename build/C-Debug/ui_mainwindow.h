@@ -44,8 +44,10 @@ public:
     QWidget *ContentContainer;
     QVBoxLayout *rightVBox;
     QHBoxLayout *toolBarLayout;
+    QToolButton *SaveBtn;
     QToolButton *UndoBtn;
     QToolButton *RedoBtn;
+    QToolButton *AllSelectBtn;
     QToolButton *CopyBtn;
     QToolButton *CutBtn;
     QToolButton *PasteBtn;
@@ -75,7 +77,7 @@ public:
         scrollArea->setWidgetResizable(true);
         scrollAreaWidgetContents = new QWidget();
         scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
-        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 94, 463));
+        scrollAreaWidgetContents->setGeometry(QRect(0, 0, 69, 463));
         scrollArea->setWidget(scrollAreaWidgetContents);
 
         dockLayout->addWidget(scrollArea);
@@ -105,63 +107,187 @@ public:
         rightVBox->setContentsMargins(0, 0, 0, 0);
         toolBarLayout = new QHBoxLayout();
         toolBarLayout->setObjectName("toolBarLayout");
+        SaveBtn = new QToolButton(ContentContainer);
+        SaveBtn->setObjectName("SaveBtn");
+        SaveBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon;
+        icon.addFile(QString::fromUtf8(":/res/icons/Save.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        SaveBtn->setIcon(icon);
+        SaveBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(SaveBtn);
+
         UndoBtn = new QToolButton(ContentContainer);
         UndoBtn->setObjectName("UndoBtn");
         UndoBtn->setMinimumSize(QSize(32, 0));
-        UndoBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon;
-        icon.addFile(QString::fromUtf8(":/res/icons/Undo.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        UndoBtn->setIcon(icon);
+        UndoBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon1;
+        icon1.addFile(QString::fromUtf8(":/res/icons/Undo.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        UndoBtn->setIcon(icon1);
         UndoBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(UndoBtn);
 
         RedoBtn = new QToolButton(ContentContainer);
         RedoBtn->setObjectName("RedoBtn");
-        RedoBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon1;
-        icon1.addFile(QString::fromUtf8("res/icons/Redo.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        RedoBtn->setIcon(icon1);
+        RedoBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon2;
+        icon2.addFile(QString::fromUtf8(":/res/icons/Redo.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        RedoBtn->setIcon(icon2);
         RedoBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(RedoBtn);
 
+        AllSelectBtn = new QToolButton(ContentContainer);
+        AllSelectBtn->setObjectName("AllSelectBtn");
+        AllSelectBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon3;
+        icon3.addFile(QString::fromUtf8(":/res/icons/AllSelect.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        AllSelectBtn->setIcon(icon3);
+        AllSelectBtn->setIconSize(QSize(24, 24));
+
+        toolBarLayout->addWidget(AllSelectBtn);
+
         CopyBtn = new QToolButton(ContentContainer);
         CopyBtn->setObjectName("CopyBtn");
-        CopyBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon2;
-        icon2.addFile(QString::fromUtf8("res/icons/Copy.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        CopyBtn->setIcon(icon2);
+        CopyBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon4;
+        icon4.addFile(QString::fromUtf8(":/res/icons/Copy.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        CopyBtn->setIcon(icon4);
         CopyBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(CopyBtn);
 
         CutBtn = new QToolButton(ContentContainer);
         CutBtn->setObjectName("CutBtn");
-        CutBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon3;
-        icon3.addFile(QString::fromUtf8("res/icons/Cut.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        CutBtn->setIcon(icon3);
+        CutBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon5;
+        icon5.addFile(QString::fromUtf8(":/res/icons/Cut.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        CutBtn->setIcon(icon5);
         CutBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(CutBtn);
 
         PasteBtn = new QToolButton(ContentContainer);
         PasteBtn->setObjectName("PasteBtn");
-        PasteBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon4;
-        icon4.addFile(QString::fromUtf8(":/res/icons/Paste.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        PasteBtn->setIcon(icon4);
+        PasteBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon6;
+        icon6.addFile(QString::fromUtf8(":/res/icons/Paste.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        PasteBtn->setIcon(icon6);
         PasteBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(PasteBtn);
 
         FindBtn = new QToolButton(ContentContainer);
         FindBtn->setObjectName("FindBtn");
-        FindBtn->setStyleSheet(QString::fromUtf8("background: transparent; border: none;"));
-        QIcon icon5;
-        icon5.addFile(QString::fromUtf8(":/res/icons/Find.svg"), QSize(), QIcon::Normal, QIcon::Off);
-        FindBtn->setIcon(icon5);
+        FindBtn->setStyleSheet(QString::fromUtf8("\n"
+"                QToolButton {\n"
+"                    background: transparent;\n"
+"                    border: none;\n"
+"                    border-radius: 6px;\n"
+"                    padding: 2px;\n"
+"                }\n"
+"                QToolButton:hover {\n"
+"                    background: #e0e0e0;\n"
+"                }\n"
+"                QToolButton:pressed {\n"
+"                    background: #b0b0b0;\n"
+"                }\n"
+"             "));
+        QIcon icon7;
+        icon7.addFile(QString::fromUtf8(":/res/icons/Find.svg"), QSize(), QIcon::Normal, QIcon::Off);
+        FindBtn->setIcon(icon7);
         FindBtn->setIconSize(QSize(24, 24));
 
         toolBarLayout->addWidget(FindBtn);

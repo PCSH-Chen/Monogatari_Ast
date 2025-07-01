@@ -337,7 +337,8 @@ DIST          = /Qt/6.5.3/macos/mkspecs/features/spec_pre.prf \
 		/Qt/6.5.3/macos/mkspecs/features/exceptions.prf \
 		/Qt/6.5.3/macos/mkspecs/features/yacc.prf \
 		/Qt/6.5.3/macos/mkspecs/features/lex.prf \
-		../../../../MonogatariAshisutando.pro ../../mainwindow.h ../../main.cpp \
+		../../../../MonogatariAshisutando.pro ../../ModuleTemplate.h \
+		../../mainwindow.h ../../main.cpp \
 		../../mainwindow.cpp
 QMAKE_TARGET  = MonogatariAshisutando
 DESTDIR       = 
@@ -955,7 +956,7 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../icons.qrc $(DISTDIR)/
-	$(COPY_FILE) --parents ../../mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../ModuleTemplate.h ../../mainwindow.h $(DISTDIR)/
 	$(COPY_FILE) --parents ../../main.cpp ../../mainwindow.cpp $(DISTDIR)/
 	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 

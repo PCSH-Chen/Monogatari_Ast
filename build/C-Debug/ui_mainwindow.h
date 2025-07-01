@@ -65,7 +65,7 @@ public:
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(960, 540);
         MainWindow->setMinimumSize(QSize(960, 540));
-        MainWindow->setTabShape(QTabWidget::Triangular);
+        MainWindow->setTabShape(QTabWidget::Rounded);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         mainLayout = new QHBoxLayout(centralwidget);

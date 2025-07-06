@@ -16,6 +16,7 @@ add_library(BaseInfo SHARED
   BaseInfo.cpp
   BaseInfo.h
   BaseInfo.ui
+  ../../ModuleTemplate.h
 
 )
 

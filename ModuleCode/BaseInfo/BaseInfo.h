@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QSet>
 #include <QStringListModel>
-#include "ModuleTemplate.h"
+#include "../../ModuleTemplate.h"
 #include "ui_BaseInfo.h" // 由 uic 自動產生
 
 QT_BEGIN_NAMESPACE
@@ -14,7 +14,7 @@ QT_END_NAMESPACE
 class BaseInfoModule : public QWidget, public ModuleTemplate
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID ModuleInterface_iid FILE "BaseInfo.json") // 您可以選擇性地使用 JSON 檔案來描述插件元數據
+    Q_PLUGIN_METADATA(IID ModuleInterface_iid) // 模組元數據
     Q_INTERFACES(ModuleTemplate)
 
 public:
@@ -23,12 +23,16 @@ public:
 
     // --- ModuleTemplate 介面實作 ---
     QString name() const override;
-    QString moduleName() const override;
+    QUuid moduleUuid() const override;
+    int priority() const override;
     QIcon icon() const override;
     QWidget* widget() override;
     void OpenFile(const QString& content, const QString& type) override;
     QString SaveFile(const QString& content, const QString& type) override;
     void connectToMainContent(QObject* mainContentWidget) override;
+
+    // --- 額外方法 (非介面必需) ---
+    QString moduleName() const;
 
     // --- 對外擴充函數 ---
     void WordsListImport(const QVector<QString>& lists);

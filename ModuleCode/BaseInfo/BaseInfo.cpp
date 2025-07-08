@@ -5,6 +5,7 @@
 #include <QPlainTextEdit>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QUuid>
 
 BaseInfoModule::BaseInfoModule(QWidget *parent)
     : QWidget(parent), ui(new Ui::BaseInfo), m_tagModel(new QStringListModel(this))
@@ -39,6 +40,8 @@ void BaseInfoModule::setupUI()
 // --- ModuleTemplate 介面實作 ---
 
 QString BaseInfoModule::name() const { return "基本資訊"; }
+QUuid BaseInfoModule::moduleUuid() const { return QUuid("12345678-1234-1234-1234-123456789abc"); }
+int BaseInfoModule::priority() const { return 100; } // 高優先級，在側邊欄第一個顯示
 QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
 QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
 QWidget* BaseInfoModule::widget() { return this; }

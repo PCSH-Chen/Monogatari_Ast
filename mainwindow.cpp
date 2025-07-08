@@ -8,11 +8,13 @@
 #include <QApplication>
 #include <QStackedWidget>
 #include <QUuid>
+#include <QTimer>
 #include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , moduleStateTimer(new QTimer(this))
 {
     ui->setupUi(this);
 
@@ -24,16 +26,38 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->CutBtn, &QToolButton::clicked, this, &MainWindow::onCutClicked);
     connect(ui->PasteBtn, &QToolButton::clicked, this, &MainWindow::onPasteClicked);
 
+    // 模組切換控制
+    if (ui->SideBar) {
+        connect(ui->SideBar, QOverload<int>::of(&QStackedWidget::currentChanged),
+                this, &MainWindow::onModuleActivated);
+    }
+    
+    // 設定模組狀態檢查定時器
+    moduleStateTimer->setInterval(5000); // 每5秒檢查一次
+    connect(moduleStateTimer, &QTimer::timeout, this, &MainWindow::checkModuleStates);
+    
+    // Content 變更信號
+    if (ui->Content) {
+        connect(ui->Content, &QPlainTextEdit::textChanged, this, &MainWindow::contentChanged);
+    }
+
     // 預留 SaveBtn, FindBtn
     // connect(ui->SaveBtn, &QToolButton::clicked, ...);
     // connect(ui->FindBtn, &QToolButton::clicked, ...);
 
+    // 設定 Content 共享
+    setupContentSharing();
+    
     // 載入模塊
     loadModules();
+    
+    // 開始模組狀態監控
+    moduleStateTimer->start();
 }
 
 MainWindow::~MainWindow()
 {
+    moduleStateTimer->stop();
     unloadModules();
     delete ui;
 }
@@ -124,15 +148,33 @@ void MainWindow::loadModule(const QString& filePath)
         delete loader;
         return;
     }
+    
+    // 檢查版本相容性
+    if (!module->isCompatible(QApplication::applicationVersion())) {
+        qWarning() << "Module" << module->name() << "is not compatible with app version"
+                   << QApplication::applicationVersion()
+                   << "(module requires:" << module->minAppVersion() << ")";
+        loader->unload();
+        delete loader;
+        return;
+    }
 
     // 成功載入模塊，創建模塊資訊
-    ModuleInfo moduleInfo(module, loader);
+    ModuleInfo moduleInfo(module, loader, filePath);
+    moduleInfo.state = ModuleState::Loading;
     moduleInfos.append(moduleInfo);
+    
+    // 處理模組生命週期
+    handleModuleLifecycle(moduleInfos.last());
 
+    logModuleOperation("Load", module->name(), true);
     qDebug() << "Successfully loaded module:"
              << module->name()
              << "UUID:" << moduleUuid.toString()
-             << "Priority:" << module->priority();
+             << "Priority:" << module->priority()
+             << "Version:" << module->version();
+    
+    emit moduleLoaded(module->name());
 }
 
 bool MainWindow::isModuleUuidExists(const QUuid& uuid)
@@ -172,21 +214,38 @@ void MainWindow::sortModulesByPriority()
 void MainWindow::addModulesToSideBar()
 {
     if (!ui->SideBar) {
+        qWarning() << "SideBar widget is null";
         return;
     }
 
-    for (const ModuleInfo& info : moduleInfos) {
+    moduleIndexMap.clear();
+
+    for (int i = 0; i < moduleInfos.size(); ++i) {
+        ModuleInfo& info = moduleInfos[i];
         try {
             // 獲取模塊的 widget
             QWidget* moduleWidget = info.module->widget();
             if (!moduleWidget) {
                 qWarning() << "Module" << info.module->name() << "returned null widget";
+                info.state = ModuleState::Error;
+                info.errorMessage = "Module returned null widget";
                 continue;
             }
 
+            // 設定 Content 存取權限
+            info.module->setContentAccess(ui->Content);
+            
             // 將模塊 widget 新增到 SideBar (QStackedWidget)
             int index = ui->SideBar->addWidget(moduleWidget);
+            
+            // 建立 UUID 到索引的映射
+            moduleIndexMap[info.uuid] = index;
+            
+            // 更新模組狀態
+            info.state = ModuleState::Loaded;
+            info.module->setState(ModuleState::Loaded);
 
+            logModuleOperation("AddToSideBar", info.module->name(), true);
             qDebug() << "Added module" << info.module->name()
                      << "to sidebar at index" << index
                      << "(Priority:" << info.priority << ")";
@@ -194,15 +253,27 @@ void MainWindow::addModulesToSideBar()
         } catch (const std::exception& e) {
             qWarning() << "Exception while adding module"
                        << info.module->name() << "to sidebar:" << e.what();
+            info.state = ModuleState::Error;
+            info.errorMessage = QString("Exception: %1").arg(e.what());
+            emit moduleError(info.module->name(), info.errorMessage);
         } catch (...) {
             qWarning() << "Unknown exception while adding module"
                        << info.module->name() << "to sidebar";
+            info.state = ModuleState::Error;
+            info.errorMessage = "Unknown exception occurred";
+            emit moduleError(info.module->name(), info.errorMessage);
         }
     }
 
     // 如果有模塊，設定第一個（最高優先級）為當前頁面
     if (!moduleInfos.isEmpty() && ui->SideBar->count() > 0) {
         ui->SideBar->setCurrentIndex(0);
+        if (moduleInfos.first().state == ModuleState::Loaded) {
+            moduleInfos.first().state = ModuleState::Active;
+            moduleInfos.first().module->setState(ModuleState::Active);
+            moduleInfos.first().module->activate();
+            emit moduleActivated(moduleInfos.first().module->name());
+        }
         qDebug() << "Set highest priority module as current:"
                  << moduleInfos.first().module->name();
     }
@@ -210,14 +281,32 @@ void MainWindow::addModulesToSideBar()
 
 void MainWindow::unloadModules()
 {
+    // 停止模組狀態監控
+    moduleStateTimer->stop();
+    
     // 卸載所有模塊
-    for (const ModuleInfo& info : moduleInfos) {
+    for (ModuleInfo& info : moduleInfos) {
+        if (info.module) {
+            // 處理模組生命週期
+            if (info.state == ModuleState::Active) {
+                info.module->deactivate();
+            }
+            info.module->cleanup();
+            info.state = ModuleState::Unloading;
+            info.module->setState(ModuleState::Unloading);
+        }
+        
         if (info.loader) {
             info.loader->unload();
             delete info.loader;
         }
+        
+        logModuleOperation("Unload", info.module ? info.module->name() : "Unknown", true);
+        emit moduleUnloaded(info.module ? info.module->name() : "Unknown");
     }
+    
     moduleInfos.clear();
+    moduleIndexMap.clear();
 
     qDebug() << "All modules unloaded";
 }
@@ -257,4 +346,135 @@ void MainWindow::onPasteClicked()
 {
     if (ui->Content)
         ui->Content->paste();
+}
+
+// 新增模組管理槽函數
+void MainWindow::onModuleActivated(int index)
+{
+    if (index < 0 || index >= moduleInfos.size()) {
+        return;
+    }
+
+    // 停用當前活躍模組
+    for (ModuleInfo& info : moduleInfos) {
+        if (info.state == ModuleState::Active) {
+            info.module->deactivate();
+            info.state = ModuleState::Loaded;
+            info.module->setState(ModuleState::Loaded);
+        }
+    }
+
+    // 根據 SideBar 索引找到對應的模組
+    QUuid targetUuid;
+    for (auto it = moduleIndexMap.begin(); it != moduleIndexMap.end(); ++it) {
+        if (it.value() == index) {
+            targetUuid = it.key();
+            break;
+        }
+    }
+
+    if (targetUuid.isNull()) {
+        qWarning() << "Cannot find module for sidebar index:" << index;
+        return;
+    }
+
+    ModuleInfo* info = findModuleByUuid(targetUuid);
+    if (info && info->module && info->state == ModuleState::Loaded) {
+        info->module->activate();
+        info->state = ModuleState::Active;
+        info->module->setState(ModuleState::Active);
+        emit moduleActivated(info->module->name());
+        qDebug() << "Activated module:" << info->module->name();
+    }
+}
+
+void MainWindow::onModuleError(const QString& moduleName, const QString& error)
+{
+    qWarning() << "Module error in" << moduleName << ":" << error;
+    // 可以在這裡顯示錯誤對話框或狀態列消息
+}
+
+void MainWindow::checkModuleStates()
+{
+    for (ModuleInfo& info : moduleInfos) {
+        if (info.module) {
+            ModuleState currentState = info.module->state();
+            if (currentState != info.state) {
+                qDebug() << "Module" << info.module->name() 
+                         << "state changed from" << static_cast<int>(info.state)
+                         << "to" << static_cast<int>(currentState);
+                info.state = currentState;
+                
+                if (currentState == ModuleState::Error) {
+                    emit moduleError(info.module->name(), "Module reported error state");
+                }
+            }
+        }
+    }
+}
+
+// 新增模組管理輔助函數
+void MainWindow::setupContentSharing()
+{
+    // 這個函數在模組載入之前被呼叫，目前只記錄日誌
+    qDebug() << "Setting up Content sharing mechanism";
+}
+
+void MainWindow::updateModuleState(const QUuid& uuid, ModuleState newState)
+{
+    ModuleInfo* info = findModuleByUuid(uuid);
+    if (info) {
+        info->state = newState;
+        if (info->module) {
+            info->module->setState(newState);
+        }
+        qDebug() << "Updated module state for" << (info->module ? info->module->name() : "Unknown")
+                 << "to" << static_cast<int>(newState);
+    }
+}
+
+ModuleInfo* MainWindow::findModuleByUuid(const QUuid& uuid)
+{
+    for (ModuleInfo& info : moduleInfos) {
+        if (info.uuid == uuid) {
+            return &info;
+        }
+    }
+    return nullptr;
+}
+
+void MainWindow::handleModuleLifecycle(ModuleInfo& info)
+{
+    if (!info.module) {
+        return;
+    }
+    
+    try {
+        // 初始化模組
+        if (info.module->initialize()) {
+            info.state = ModuleState::Loaded;
+            info.module->setState(ModuleState::Loaded);
+            logModuleOperation("Initialize", info.module->name(), true);
+        } else {
+            info.state = ModuleState::Error;
+            info.errorMessage = "Module initialization failed";
+            info.module->setState(ModuleState::Error);
+            logModuleOperation("Initialize", info.module->name(), false);
+            emit moduleError(info.module->name(), info.errorMessage);
+        }
+    } catch (const std::exception& e) {
+        info.state = ModuleState::Error;
+        info.errorMessage = QString("Exception during initialization: %1").arg(e.what());
+        if (info.module) {
+            info.module->setState(ModuleState::Error);
+        }
+        logModuleOperation("Initialize", info.module->name(), false);
+        emit moduleError(info.module->name(), info.errorMessage);
+    }
+}
+
+void MainWindow::logModuleOperation(const QString& operation, const QString& moduleName, bool success)
+{
+    QString status = success ? "SUCCESS" : "FAILED";
+    qDebug() << "[MODULE]" << operation << moduleName << "-" << status;
 }

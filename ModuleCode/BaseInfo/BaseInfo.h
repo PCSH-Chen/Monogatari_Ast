@@ -23,14 +23,19 @@ public:
 
     // --- ModuleTemplate 介面實作 ---
     QString name() const override;
-    QString moduleName() const override;
+    QUuid moduleUuid() const override;
+    int priority() const override;
     QIcon icon() const override;
     QWidget* widget() override;
     void OpenFile(const QString& content, const QString& type) override;
     QString SaveFile(const QString& content, const QString& type) override;
-    void connectToMainContent(QObject* mainContentWidget) override;
-
-    // --- 對外擴充函數 ---
+    
+    // 新增的 ModuleTemplate 介面
+    void setContentAccess(QObject* contentWidget) override;
+    
+    // --- 擴充函數（保持向後相容） ---
+    QString moduleName() const;  // 為了向後相容保留
+    void connectToMainContent(QObject* mainContentWidget);  // 為了向後相容保留
     void WordsListImport(const QVector<QString>& lists);
 
 private slots:

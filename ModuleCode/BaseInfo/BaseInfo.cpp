@@ -39,6 +39,16 @@ void BaseInfoModule::setupUI()
 // --- ModuleTemplate 介面實作 ---
 
 QString BaseInfoModule::name() const { return "基本資訊"; }
+
+QUuid BaseInfoModule::moduleUuid() const { 
+    // 為 BaseInfo 模組建立固定的 UUID
+    return QUuid("{12345678-1234-5678-9abc-123456789abc}"); 
+}
+
+int BaseInfoModule::priority() const { 
+    return 100;  // 高優先級，作為基本資訊模組
+}
+
 QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
 QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
 QWidget* BaseInfoModule::widget() { return this; }
@@ -56,6 +66,12 @@ QString BaseInfoModule::SaveFile(const QString& content, const QString& type)
     Q_UNUSED(content);
     Q_UNUSED(type);
     return QString();
+}
+
+void BaseInfoModule::setContentAccess(QObject* contentWidget)
+{
+    // 實作新的 Content 存取介面
+    connectToMainContent(contentWidget);
 }
 
 void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)

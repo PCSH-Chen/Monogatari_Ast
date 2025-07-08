@@ -51,13 +51,13 @@ void MainWindow::loadModules()
 
     // 設定支援的模塊檔案過濾器
     QStringList filters;
-#ifdef Q_OS_WIN
-    filters << "*.dll";
-#elif defined(Q_OS_MAC)
-    filters << "*.dylib";
-#else
-    filters << "*.so";
-#endif
+    #ifdef Q_OS_WIN
+        filters << "*.dll";
+    #elif defined(Q_OS_MAC)
+        filters << "*.dylib";
+    #else
+        filters << "*.so";
+    #endif
 
     modulesDir.setNameFilters(filters);
     QStringList moduleFiles = modulesDir.entryList(QDir::Files);

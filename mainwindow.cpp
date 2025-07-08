@@ -187,6 +187,14 @@ void MainWindow::addModulesToSideBar()
             // 將模塊 widget 新增到 SideBar (QStackedWidget)
             int index = ui->SideBar->addWidget(moduleWidget);
 
+            // 連接模塊到主內容區域，允許模塊存取和操作內容
+            if (ui->Content) {
+                info.module->connectToMainContent(ui->Content);
+                qDebug() << "Connected module" << info.module->name() << "to main content";
+            } else {
+                qWarning() << "Main content widget is null, cannot connect module" << info.module->name();
+            }
+
             qDebug() << "Added module" << info.module->name()
                      << "to sidebar at index" << index
                      << "(Priority:" << info.priority << ")";

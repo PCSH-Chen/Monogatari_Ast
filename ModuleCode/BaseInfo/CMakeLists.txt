@@ -23,3 +23,6 @@ add_library(BaseInfo SHARED
 target_link_libraries(BaseInfo PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_compile_definitions(BaseInfo PRIVATE BASEINFO_LIBRARY)
+
+# Ensure autogen headers are found
+target_include_directories(BaseInfo PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/BaseInfo_autogen/include)

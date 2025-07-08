@@ -17,6 +17,9 @@ public:
     // 如需支援文件操作，下列為純虛函式定義
     virtual void OpenFile(const QString& content, const QString& type) = 0;
     virtual QString SaveFile(const QString& content, const QString& type) = 0;
+    
+    // 連接到主視窗內容區域，允許模塊存取和操作主要內容
+    virtual void connectToMainContent(QObject* mainContentWidget) = 0;
 };
 
 #define ModuleInterface_iid "org.example.Monogatari.ModuleTemplate"

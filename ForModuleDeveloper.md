@@ -45,7 +45,7 @@ Q_DECLARE_INTERFACE(ModuleTemplate, ModuleInterface_iid)
 * `QString name() const`：
   回傳模組在 UI 中顯示的名稱。
 
-* `QString moduleUuid() const`：
+* `QUuid moduleUuid() const`：
   回傳模組的唯一識別UUID。
 
 * `QIcon icon() const`：

@@ -25,7 +25,7 @@ class ModuleTemplate {
 public:
     virtual ~ModuleTemplate() = default;
     virtual QString name() const = 0;           // 顯示名稱
-    virtual QString moduleName() const = 0;     // 唯一識別名稱
+    virtual QString moduleUuid() const = 0;     // 唯一識別名稱
     virtual QIcon icon() const = 0;             // 64x64 圖示
     virtual QWidget* widget() = 0;              // 提供內容顯示的 QWidget
 

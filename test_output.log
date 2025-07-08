@@ -1,0 +1,18 @@
+Setting up Content sharing mechanism
+Found 1 potential modules in "/home/runner/work/Monogatari_Ast/Monogatari_Ast/Modules"
+Attempting to load module: "/home/runner/work/Monogatari_Ast/Monogatari_Ast/Modules/libTestModule.so"
+TestModule::initialize called
+[MODULE] "Initialize" "測試模組" - "SUCCESS"
+[MODULE] "Load" "測試模組" - "SUCCESS"
+Successfully loaded module: "測試模組" UUID: "{12345678-1234-5678-9abc-123456789def}" Priority: 10 Version: "1.0.0"
+Modules sorted by priority:
+"  1. 測試模組 (Priority: 10, UUID: {12345678-1234-5678-9abc-123456789def})"
+TestModule::setContentAccess called
+TestModule: Content changed, new length: 0
+TestModule: Successfully connected to Content widget
+[MODULE] "AddToSideBar" "測試模組" - "SUCCESS"
+Added module "測試模組" to sidebar at index 2 (Priority: 10 )
+TestModule::activate called
+Set highest priority module as current: "測試模組"
+Successfully loaded 1 modules
+Module "測試模組" state changed from 3 to 2

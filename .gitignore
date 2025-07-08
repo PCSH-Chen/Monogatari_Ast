@@ -1,0 +1,25 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+MonogatariAshisutando
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+Makefile
+.qmake.stash
+moc_predefs.h
+
+# Qt Creator files
+*.pro.user*
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo

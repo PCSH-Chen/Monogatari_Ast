@@ -25,13 +25,13 @@ class ModuleTemplate {
 public:
     virtual ~ModuleTemplate() = default;
     virtual QString name() const = 0;           // 顯示名稱
-    virtual QString moduleUuid() const = 0;     // 唯一識別名稱
+    virtual QUuid moduleUuid() const = 0;     // 唯一識別名稱
     virtual QIcon icon() const = 0;             // 64x64 圖示
     virtual QWidget* widget() = 0;              // 提供內容顯示的 QWidget
 
     // 若模組需處理檔案內容，需實作以下方法
-    virtual void OpenFile(const QString& content, const QString& type) = 0;
-    virtual QString SaveFile(const QString& content, const QString& type) = 0;
+    virtual void OpenFile(const QString& content) = 0;
+    virtual QString SaveFile() = 0;
 };
 
 #define ModuleInterface_iid "org.example.Monogatari.ModuleTemplate"
@@ -54,10 +54,10 @@ Q_DECLARE_INTERFACE(ModuleTemplate, ModuleInterface_iid)
 * `QWidget* widget()`：
   提供模組的主要畫面元件（會嵌入於主視窗中）。
 
-* `void OpenFile(const QString& content, const QString& type)`：
-  可選實作。由主程式呼叫以提供載入的檔案內容及格式。
+* `void OpenFile(const QString& content)`：
+  可選實作。由主程式呼叫以提供載入的檔案內容。
 
-* `QString SaveFile(const QString& content, const QString& type)`：
+* `QString SaveFile()`：
   可選實作。由主程式呼叫以取得儲存後的內容資料。
 
 ---

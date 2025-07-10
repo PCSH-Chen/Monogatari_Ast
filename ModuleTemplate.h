@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QWidget>
 #include <QUuid>
+#include <QObject>
 
 class ModuleTemplate {
 public:
@@ -14,9 +15,13 @@ public:
     virtual QIcon icon() const = 0;             // 64x64 icon
     virtual QWidget* widget() = 0;              // 內容顯示用
 
-    // 如需支援文件操作，下列為純虛函式定義
-    virtual void OpenFile(const QString& content, const QString& type) = 0;
-    virtual QString SaveFile(const QString& content, const QString& type) = 0;
+    // 檔案操作介面 - Type 由函式自行判定
+    virtual void OpenFile(const QString& content) = 0;
+    virtual QString SaveFile() = 0;
+
+    // 共享資源存取介面
+    virtual void setContentAccess(QObject* contentWidget) = 0;    // 設定 Content 存取
+    virtual void setChapterAccess(const QStringList& chapterIdx, const QStringList& chapterLabel) = 0; // 設定章節存取
 };
 
 #define ModuleInterface_iid "org.example.Monogatari.ModuleTemplate"

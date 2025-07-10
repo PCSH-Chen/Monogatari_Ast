@@ -42,6 +42,8 @@ private slots:
     void onCopyClicked();
     void onCutClicked();
     void onPasteClicked();
+    void onOpenFile();
+    void onSaveFile();
 
 private:
     // 模塊相關函式
@@ -51,6 +53,11 @@ private:
     void sortModulesByPriority();
     void addModulesToSideBar();
     bool isModuleUuidExists(const QUuid& uuid);
+    
+    // 檔案操作函式
+    void openFileToModules(const QString& content);
+    QString saveFileFromModules();
+    void updateChapterAccess();
 
     // 成員變數
     Ui::MainWindow *ui;

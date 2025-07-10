@@ -40,27 +40,29 @@ void BaseInfoModule::setupUI()
 
 QString BaseInfoModule::name() const { return "基本資訊"; }
 QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
+QUuid BaseInfoModule::moduleUuid() const { return QUuid("550e8400-e29b-41d4-a716-446655440000"); }
+int BaseInfoModule::priority() const { return 100; } // 高優先級
 QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
 QWidget* BaseInfoModule::widget() { return this; }
 
-void BaseInfoModule::OpenFile(const QString& content, const QString& type)
+void BaseInfoModule::OpenFile(const QString& content)
 {
-    // TODO: 實作開啟檔案時的資料載入邏輯
+    // 根據內容自動判斷類型並載入
+    // 這裡可以檢查 content 的格式來判斷如何處理
     Q_UNUSED(content);
-    Q_UNUSED(type);
+    // TODO: 實作開啟檔案時的資料載入邏輯
 }
 
-QString BaseInfoModule::SaveFile(const QString& content, const QString& type)
+QString BaseInfoModule::SaveFile()
 {
+    // 自動判斷並產生適當格式的儲存內容
     // TODO: 實作儲存檔案時的資料匯出邏輯
-    Q_UNUSED(content);
-    Q_UNUSED(type);
     return QString();
 }
 
-void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)
+void BaseInfoModule::setContentAccess(QObject* contentWidget)
 {
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(mainContentWidget);
+    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(contentWidget);
     if (contentEdit) {
         connect(contentEdit, &QPlainTextEdit::textChanged, this, &BaseInfoModule::onContentChanged);
         // 初始更新一次
@@ -68,6 +70,14 @@ void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)
     } else {
         qWarning() << "BaseInfoModule: Failed to connect to main content widget. It is not a QPlainTextEdit.";
     }
+}
+
+void BaseInfoModule::setChapterAccess(const QStringList& chapterIdx, const QStringList& chapterLabel)
+{
+    // TODO: 實作章節資訊存取功能
+    // 可以用來更新章節相關的 UI 或進行章節分析
+    Q_UNUSED(chapterIdx);
+    Q_UNUSED(chapterLabel);
 }
 
 

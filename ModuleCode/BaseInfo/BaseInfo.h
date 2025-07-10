@@ -23,12 +23,17 @@ public:
 
     // --- ModuleTemplate 介面實作 ---
     QString name() const override;
-    QString moduleName() const override;
+    QUuid moduleUuid() const override;
+    int priority() const override;
     QIcon icon() const override;
     QWidget* widget() override;
-    void OpenFile(const QString& content, const QString& type) override;
-    QString SaveFile(const QString& content, const QString& type) override;
-    void connectToMainContent(QObject* mainContentWidget) override;
+    void OpenFile(const QString& content) override;
+    QString SaveFile() override;
+    void setContentAccess(QObject* contentWidget) override;
+    void setChapterAccess(const QStringList& chapterIdx, const QStringList& chapterLabel) override;
+    
+    // --- 擴充方法 ---
+    QString moduleName() const;
 
     // --- 對外擴充函數 ---
     void WordsListImport(const QVector<QString>& lists);

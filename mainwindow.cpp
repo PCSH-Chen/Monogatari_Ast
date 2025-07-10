@@ -8,6 +8,9 @@
 #include <QApplication>
 #include <QStackedWidget>
 #include <QUuid>
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
 #include <algorithm>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -25,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->PasteBtn, &QToolButton::clicked, this, &MainWindow::onPasteClicked);
 
     // 預留 SaveBtn, FindBtn
-    // connect(ui->SaveBtn, &QToolButton::clicked, ...);
+    connect(ui->SaveBtn, &QToolButton::clicked, this, &MainWindow::onSaveFile);
     // connect(ui->FindBtn, &QToolButton::clicked, ...);
 
     // 載入模塊
@@ -187,6 +190,12 @@ void MainWindow::addModulesToSideBar()
             // 將模塊 widget 新增到 SideBar (QStackedWidget)
             int index = ui->SideBar->addWidget(moduleWidget);
 
+            // 設定共享資源存取
+            if (ui->Content) {
+                info.module->setContentAccess(ui->Content);
+                qDebug() << "Set content access for module" << info.module->name();
+            }
+
             qDebug() << "Added module" << info.module->name()
                      << "to sidebar at index" << index
                      << "(Priority:" << info.priority << ")";
@@ -206,6 +215,9 @@ void MainWindow::addModulesToSideBar()
         qDebug() << "Set highest priority module as current:"
                  << moduleInfos.first().module->name();
     }
+
+    // 更新章節存取資訊
+    updateChapterAccess();
 }
 
 void MainWindow::unloadModules()
@@ -257,4 +269,143 @@ void MainWindow::onPasteClicked()
 {
     if (ui->Content)
         ui->Content->paste();
+}
+
+void MainWindow::onOpenFile()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, 
+        tr("開啟檔案"), 
+        "",
+        tr("物語檔案 (*.mgf);;所有檔案 (*.*)"));
+    
+    if (!fileName.isEmpty()) {
+        QFile file(fileName);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            QString content = in.readAll();
+            openFileToModules(content);
+            
+            // 同時載入到主編輯器
+            if (ui->Content) {
+                ui->Content->setPlainText(content);
+            }
+            
+            qDebug() << "Opened file:" << fileName;
+        } else {
+            QMessageBox::warning(this, tr("錯誤"), tr("無法開啟檔案：") + fileName);
+        }
+    }
+}
+
+void MainWindow::onSaveFile()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+        tr("儲存檔案"),
+        "",
+        tr("物語檔案 (*.mgf);;所有檔案 (*.*)"));
+    
+    if (!fileName.isEmpty()) {
+        QString content = saveFileFromModules();
+        
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            out << content;
+            qDebug() << "Saved file:" << fileName;
+        } else {
+            QMessageBox::warning(this, tr("錯誤"), tr("無法儲存檔案：") + fileName);
+        }
+    }
+}
+
+void MainWindow::openFileToModules(const QString& content)
+{
+    for (const ModuleInfo& info : moduleInfos) {
+        try {
+            info.module->OpenFile(content);
+            qDebug() << "Opened file content to module:" << info.module->name();
+        } catch (const std::exception& e) {
+            qWarning() << "Exception while opening file to module" 
+                       << info.module->name() << ":" << e.what();
+        } catch (...) {
+            qWarning() << "Unknown exception while opening file to module" 
+                       << info.module->name();
+        }
+    }
+}
+
+QString MainWindow::saveFileFromModules()
+{
+    QString result = "<Document>\n";
+    
+    // 儲存主要內容
+    if (ui->Content) {
+        result += "    <MainContent>\n";
+        result += "        " + ui->Content->toPlainText().replace("\n", "\n        ") + "\n";
+        result += "    </MainContent>\n";
+    }
+    
+    // 儲存各模組資料
+    for (const ModuleInfo& info : moduleInfos) {
+        try {
+            QString moduleData = info.module->SaveFile();
+            if (!moduleData.isEmpty()) {
+                result += "    <Module name=\"" + info.module->name() + "\" uuid=\"" + info.uuid.toString() + "\">\n";
+                result += "        " + moduleData.replace("\n", "\n        ") + "\n";
+                result += "    </Module>\n";
+                qDebug() << "Saved data from module:" << info.module->name();
+            }
+        } catch (const std::exception& e) {
+            qWarning() << "Exception while saving from module" 
+                       << info.module->name() << ":" << e.what();
+        } catch (...) {
+            qWarning() << "Unknown exception while saving from module" 
+                       << info.module->name();
+        }
+    }
+    
+    result += "</Document>";
+    return result;
+}
+
+void MainWindow::updateChapterAccess()
+{
+    // 這裡可以實作從文件內容中自動解析章節的邏輯
+    // 目前提供示例資料
+    QStringList chapterIdx;
+    QStringList chapterLabel;
+    
+    if (ui->Content) {
+        QString content = ui->Content->toPlainText();
+        // 簡單的章節檢測邏輯（可以根據實際需求改進）
+        QStringList lines = content.split('\n');
+        int chapterCount = 0;
+        
+        for (const QString& line : lines) {
+            if (line.contains("第") && line.contains("章")) {
+                chapterCount++;
+                chapterIdx.append(QString::number(chapterCount));
+                chapterLabel.append(line.trimmed());
+            }
+        }
+    }
+    
+    // 如果沒有檢測到章節，提供預設值
+    if (chapterIdx.isEmpty()) {
+        chapterIdx = {"1", "2", "3"};
+        chapterLabel = {"第一章 開始", "第二章 冒險", "第三章 結局"};
+    }
+    
+    // 更新所有模組的章節存取
+    for (const ModuleInfo& info : moduleInfos) {
+        try {
+            info.module->setChapterAccess(chapterIdx, chapterLabel);
+        } catch (const std::exception& e) {
+            qWarning() << "Exception while updating chapter access for module"
+                       << info.module->name() << ":" << e.what();
+        } catch (...) {
+            qWarning() << "Unknown exception while updating chapter access for module"
+                       << info.module->name();
+        }
+    }
 }

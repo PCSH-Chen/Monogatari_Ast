@@ -20,6 +20,11 @@ add_library(BaseInfo SHARED
 
 )
 
+target_include_directories(BaseInfo PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 target_link_libraries(BaseInfo PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
 target_compile_definitions(BaseInfo PRIVATE BASEINFO_LIBRARY)

@@ -5,9 +5,12 @@
 #include <QPlainTextEdit>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QUuid>
+#include "ui_BaseInfo.h"  // This should be found by CMake's autogen
 
 BaseInfoModule::BaseInfoModule(QWidget *parent)
     : QWidget(parent), ui(new Ui::BaseInfo), m_tagModel(new QStringListModel(this))
+    , m_contentEditor(nullptr), m_mainWindow(nullptr)
 {
     ui->setupUi(this);
     setupUI();
@@ -39,34 +42,53 @@ void BaseInfoModule::setupUI()
 // --- ModuleTemplate 介面實作 ---
 
 QString BaseInfoModule::name() const { return "基本資訊"; }
-QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
+
+QUuid BaseInfoModule::moduleUuid() const 
+{ 
+    return QUuid("a1b2c3d4-e5f6-7890-1234-567890abcdef"); 
+}
+
+int BaseInfoModule::priority() const 
+{ 
+    return 85; // 常用功能模組
+}
+
 QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
+
 QWidget* BaseInfoModule::widget() { return this; }
 
-void BaseInfoModule::OpenFile(const QString& content, const QString& type)
+void BaseInfoModule::OpenFile(const QString& content)
 {
     // TODO: 實作開啟檔案時的資料載入邏輯
     Q_UNUSED(content);
-    Q_UNUSED(type);
 }
 
-QString BaseInfoModule::SaveFile(const QString& content, const QString& type)
+QString BaseInfoModule::SaveFile()
 {
     // TODO: 實作儲存檔案時的資料匯出邏輯
-    Q_UNUSED(content);
-    Q_UNUSED(type);
     return QString();
 }
 
-void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)
+void BaseInfoModule::setContentAccess(QPlainTextEdit* content)
 {
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(mainContentWidget);
-    if (contentEdit) {
-        connect(contentEdit, &QPlainTextEdit::textChanged, this, &BaseInfoModule::onContentChanged);
+    m_contentEditor = content;
+    if (m_contentEditor) {
+        connect(m_contentEditor, &QPlainTextEdit::textChanged, this, &BaseInfoModule::onContentChanged);
         // 初始更新一次
         onContentChanged();
+        qDebug() << "BaseInfoModule: 已連接到內容編輯器";
     } else {
-        qWarning() << "BaseInfoModule: Failed to connect to main content widget. It is not a QPlainTextEdit.";
+        qWarning() << "BaseInfoModule: 內容編輯器為空";
+    }
+}
+
+void BaseInfoModule::setChapterAccess(MainWindow* mainWindow)
+{
+    m_mainWindow = mainWindow;
+    if (m_mainWindow) {
+        qDebug() << "BaseInfoModule: 已連接到章節管理";
+    } else {
+        qWarning() << "BaseInfoModule: 章節管理為空";
     }
 }
 
@@ -93,11 +115,10 @@ void BaseInfoModule::loadStopwords()
 
 void BaseInfoModule::onContentChanged()
 {
-    // 從 sender() 獲取文本內容
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(sender());
-    if (!contentEdit) return;
+    // 使用存儲的內容編輯器引用
+    if (!m_contentEditor) return;
 
-    QString currentText = contentEdit->toPlainText();
+    QString currentText = m_contentEditor->toPlainText();
 
     updateWordCount(currentText);
     updateRecentWords(currentText);

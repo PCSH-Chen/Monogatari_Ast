@@ -6,8 +6,7 @@
 #include <QStringListModel>
 #include <QPlainTextEdit>
 #include <QUuid>
-#include "ModuleTemplate.h"
-#include "ui_BaseInfo.h" // 由 uic 自動產生
+#include "../../ModuleTemplate.h"
 
 class MainWindow; // 前向宣告
 
@@ -18,7 +17,7 @@ QT_END_NAMESPACE
 class BaseInfoModule : public QWidget, public ModuleTemplate
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID ModuleInterface_iid FILE "BaseInfo.json") // 您可以選擇性地使用 JSON 檔案來描述插件元數據
+    Q_PLUGIN_METADATA(IID ModuleInterface_iid) // 移除 FILE 參數
     Q_INTERFACES(ModuleTemplate)
 
 public:

@@ -129,6 +129,9 @@ void MainWindow::loadModule(const QString& filePath)
     ModuleInfo moduleInfo(module, loader);
     moduleInfos.append(moduleInfo);
 
+    // 設定模組存取權限
+    setupModuleAccess(module);
+
     qDebug() << "Successfully loaded module:"
              << module->name()
              << "UUID:" << moduleUuid.toString()
@@ -220,6 +223,25 @@ void MainWindow::unloadModules()
     moduleInfos.clear();
 
     qDebug() << "All modules unloaded";
+}
+
+void MainWindow::setupModuleAccess(ModuleTemplate* module)
+{
+    if (!module) {
+        return;
+    }
+
+    // 設定內容編輯器存取權限
+    if (ui->Content) {
+        module->setContentAccess(ui->Content);
+        qDebug() << "Set content access for module:" << module->name();
+    } else {
+        qWarning() << "Content editor not available for module:" << module->name();
+    }
+
+    // 設定主視窗存取權限
+    module->setChapterAccess(this);
+    qDebug() << "Set chapter access for module:" << module->name();
 }
 
 // 現有的槽函數保持不變

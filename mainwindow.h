@@ -6,6 +6,7 @@
 #include <QPluginLoader>
 #include <QUuid>
 #include <QMap>
+#include <QPlainTextEdit>
 #include "ModuleTemplate.h"
 
 QT_BEGIN_NAMESPACE
@@ -50,6 +51,7 @@ private:
     void unloadModules();
     void sortModulesByPriority();
     void addModulesToSideBar();
+    void setupModuleAccess(ModuleTemplate* module);  // 新增：設定模組存取權限
     bool isModuleUuidExists(const QUuid& uuid);
 
     // 成員變數

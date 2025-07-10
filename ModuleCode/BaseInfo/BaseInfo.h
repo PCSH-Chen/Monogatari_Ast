@@ -1,60 +1,41 @@
-#ifndef BASEINFOMODULE_H
-#define BASEINFOMODULE_H
-
+#pragma once
+#include <QObject>
+#include <QString>
 #include <QWidget>
 #include <QSet>
-#include <QStringListModel>
+#include <QVector>
+#include <QIcon>
 #include "ModuleTemplate.h"
-#include "ui_BaseInfo.h" // 由 uic 自動產生
+#include "ui_BaseInfo.h"
 
-QT_BEGIN_NAMESPACE
-namespace Ui { class BaseInfo; }
-QT_END_NAMESPACE
-
-class BaseInfoModule : public QWidget, public ModuleTemplate
-{
+class BaseInfoModule : public QObject, public ModuleTemplate {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID ModuleInterface_iid FILE "BaseInfo.json") // 您可以選擇性地使用 JSON 檔案來描述插件元數據
+    Q_PLUGIN_METADATA(IID ModuleInterface_iid)
     Q_INTERFACES(ModuleTemplate)
 
 public:
-    explicit BaseInfoModule(QWidget *parent = nullptr);
-    ~BaseInfoModule() override;
+    BaseInfoModule();
+    ~BaseInfoModule();
 
-    // --- ModuleTemplate 介面實作 ---
-    QString name() const override;
-    QString moduleName() const override;
-    QIcon icon() const override;
-    QWidget* widget() override;
-    void OpenFile(const QString& content, const QString& type) override;
-    QString SaveFile(const QString& content, const QString& type) override;
-    void connectToMainContent(QObject* mainContentWidget) override;
+    // ModuleTemplate API
+    QString name() const override { return tr("基本資訊"); }
+    QString moduleUuid() const override { return QStringLiteral("a3d63b30-c9cd-4c7c-ac47-8dae778dc933"); }
+    QIcon icon() const override { return QIcon(":/icon/BaseInfo.svg"); }
+    QWidget* widget() override { return m_widget; }
+    void OpenFile(const QString& content) override;
+    QString SaveFile() override;
 
-    // --- 對外擴充函數 ---
-    void WordsListImport(const QVector<QString>& lists);
-
-private slots:
-    // --- UI 事件 ---
-    void onTagAdd();
-    void onTagDel();
-    void onTagSelectionChanged();
-
-    // --- 核心邏輯 ---
-    void onContentChanged();
+    // 外部匯入常用字（詞頻、統計值），主程式呼叫
+    void ImportWords(const QVector<QString>& words, int total, double redundancyPercent, double filterPercent);
 
 private:
-    void loadStopwords();
-    void updateWordCount(const QString& text);
-    void updateRecentWords(const QString& text);
-    void updateRedundancy(const QString& text);
-    void setupUI();
+    void loadJsonToSet(const QString& filename, QSet<QString>& targetSet);
+    void updateRecentWordsTable(const QVector<QString>& words);
 
-    Ui::BaseInfo *ui;
-    QSet<QString> m_tags;
-    QStringListModel *m_tagModel;
+    QWidget* m_widget;
+    Ui::Form ui;
 
-    QSet<QString> m_vocabulary;
-    QSet<QString> m_stopwords;
+    QSet<QString> m_words;          // 常用字集合
+    QSet<QString> m_redundancySet;  // 贅字集合
+    QSet<QString> m_filterSet;      // 修飾詞集合
 };
-
-#endif // BASEINFOMODULE_H

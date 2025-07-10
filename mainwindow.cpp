@@ -13,10 +13,12 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , ChapterIdx(QPair<int, int>(1, 1))  // 預設第1章第1節
+    , ChapterLabel("第一章")
 {
     ui->setupUi(this);
 
-    // 儲存、搜尋按鈕預留（不連接功能）
+    // 工具列按鈕連接
     connect(ui->UndoBtn, &QToolButton::clicked, this, &MainWindow::onUndoClicked);
     connect(ui->RedoBtn, &QToolButton::clicked, this, &MainWindow::onRedoClicked);
     connect(ui->AllSelectBtn, &QToolButton::clicked, this, &MainWindow::onAllSelectClicked);
@@ -36,6 +38,26 @@ MainWindow::~MainWindow()
 {
     unloadModules();
     delete ui;
+}
+
+void MainWindow::setChapterIdx(const QPair<int, int>& idx)
+{
+    if (ChapterIdx != idx) {
+        ChapterIdx = idx;
+        emit chapterIdxChanged(idx);
+        emit chapterChanged(idx, ChapterLabel);
+        qDebug() << "Chapter index changed to:" << idx.first << "," << idx.second;
+    }
+}
+
+void MainWindow::setChapterLabel(const QString& label)
+{
+    if (ChapterLabel != label) {
+        ChapterLabel = label;
+        emit chapterLabelChanged(label);
+        emit chapterChanged(ChapterIdx, label);
+        qDebug() << "Chapter label changed to:" << label;
+    }
 }
 
 void MainWindow::loadModules()
@@ -177,6 +199,12 @@ void MainWindow::addModulesToSideBar()
 
     for (const ModuleInfo& info : moduleInfos) {
         try {
+            // 設定 Content 存取權限
+            info.module->setContentAccess(ui->Content);
+
+            // 設定 Chapter 存取權限
+            info.module->setChapterAccess(this);
+
             // 獲取模塊的 widget
             QWidget* moduleWidget = info.module->widget();
             if (!moduleWidget) {
@@ -189,7 +217,8 @@ void MainWindow::addModulesToSideBar()
 
             qDebug() << "Added module" << info.module->name()
                      << "to sidebar at index" << index
-                     << "(Priority:" << info.priority << ")";
+                     << "(Priority:" << info.priority << ")"
+                     << "with Content and Chapter access";
 
         } catch (const std::exception& e) {
             qWarning() << "Exception while adding module"

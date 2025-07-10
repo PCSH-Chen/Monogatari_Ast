@@ -63,8 +63,8 @@
 
 請統一使用以下函式進行資料操作：
 
-* `void OpenFile(const QString& content, const QString& type)`
-  載入資料。請於內部實作中自行檢查 `type` 與 `content` 是否符合，並根據類型解析內容。
+* `void OpenFile(const QString& content)`
+  載入資料。模組需自行檢查 `content` 格式是否符合，並根據內容格式解析資料。
 
-* `QString SaveFile(const QString& content, const QString& type)`
-  儲存資料。由主程式呼叫以取得序列化後的內容字串。
+* `QString SaveFile()`
+  儲存資料。由主程式呼叫以取得序列化後的內容字串。模組需自行將資料序列化為合適的格式。

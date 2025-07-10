@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>RedundancyWords.json</file>
+        <file>icon/BaseInfo.svg</file>
+        <file>icon/chapter.svg</file>
+        <file>icon/character.svg</file>
+        <file>icon/list.svg</file>
+        <file>icon/outline.svg</file>
+        <file>icon/sentence.svg</file>
+        <file>icon/words.svg</file>
+        <file>icon/world.svg</file>
+    </qresource>
+</RCC>

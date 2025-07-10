@@ -1,0 +1,33 @@
+{
+	"BUILD_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/BaseInfo_autogen",
+	"CMAKE_BINARY_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo",
+	"CMAKE_SOURCE_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/BaseInfo_autogen/include",
+	"INPUTS" : 
+	[
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/RedundancyWords.json",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/chapter.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/world.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/BaseInfo.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/sentence.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/words.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/outline.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/character.svg",
+		"C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/icon/list.svg"
+	],
+	"LOCK_FILE" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/CMakeFiles/BaseInfo_autogen.dir/AutoRcc_res_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "res" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_res.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.8.0/llvm-mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug/CMakeFiles/BaseInfo_autogen.dir/AutoRcc_res_EWIEGA46WW_Used.txt",
+	"SOURCE" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/res.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}

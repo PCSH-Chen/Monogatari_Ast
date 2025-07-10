@@ -1,0 +1,78 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-d0094a50bb2071803777.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "BaseInfo",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "BaseInfo::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-BaseInfo-Debug-6f38877e0f45776b31bd.json",
+					"name" : "BaseInfo",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "BaseInfo_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-BaseInfo_autogen-Debug-7e810085c4d8a048f0b1.json",
+					"name" : "BaseInfo_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "BaseInfo_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-BaseInfo_autogen_timestamp_deps-Debug-98f2b7c3efbc35a4bc8e.json",
+					"name" : "BaseInfo_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo/build/Desktop_Qt_6_8_0_llvm_mingw_64_bit-Debug",
+		"source" : "C:/Users/heyai/Monogatari_Ast/ModuleCode/BaseInfo"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

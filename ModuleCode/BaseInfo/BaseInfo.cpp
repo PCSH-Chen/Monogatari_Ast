@@ -1,197 +1,155 @@
 #include "BaseInfo.h"
+#include <QStandardItemModel>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QPlainTextEdit>
+#include <QDomDocument>
+#include <QDateTime>
 #include <QDebug>
-#include <QRegularExpression>
 
-BaseInfoModule::BaseInfoModule(QWidget *parent)
-    : QWidget(parent), ui(new Ui::BaseInfo), m_tagModel(new QStringListModel(this))
+BaseInfoModule::BaseInfoModule()
+    : m_widget(new QWidget)
 {
-    ui->setupUi(this);
-    setupUI();
-    loadStopwords();
+    ui.setupUi(m_widget);
+
+    // 載入贅字與修飾詞詞庫
+    loadJsonToSet(":/RedundancyWords.json", m_redundancySet);
+    loadJsonToSet(":/FilterWords.json", m_filterSet);
+
+    // 初始化常用字表格
+    auto* model = new QStandardItemModel(0, 4, m_widget);
+    model->setHorizontalHeaderLabels({ tr("字詞"), tr("次數"), tr("贅字？"), tr("修飾詞？") });
+    //ui.RecentWordsTable->setModel(model);
+    ui.RecentWordsTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui.RecentWordsTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 BaseInfoModule::~BaseInfoModule()
 {
-    delete ui;
+    delete m_widget;
 }
 
-void BaseInfoModule::setupUI()
+void BaseInfoModule::loadJsonToSet(const QString& filename, QSet<QString>& targetSet)
 {
-    // 設定 Tag 列表模型
-    ui->Tagslist->setModel(m_tagModel);
-
-    // 連接訊號與槽
-    connect(ui->TagAdd, &QPushButton::clicked, this, &BaseInfoModule::onTagAdd);
-    connect(ui->TagDel, &QPushButton::clicked, this, &BaseInfoModule::onTagDel);
-
-    // 設定表格
-    ui->RecentWordsTable->setColumnCount(3);
-    ui->RecentWordsTable->setHorizontalHeaderLabels({"字詞", "次數", "贅字？"});
-    ui->RecentWordsTable->horizontalHeader()->setStretchLastSection(true);
-    ui->RecentWordsTable->setColumnWidth(0, 100);
-    ui->RecentWordsTable->setColumnWidth(1, 50);
-}
-
-// --- ModuleTemplate 介面實作 ---
-
-QString BaseInfoModule::name() const { return "基本資訊"; }
-QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
-QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
-QWidget* BaseInfoModule::widget() { return this; }
-
-void BaseInfoModule::OpenFile(const QString& content, const QString& type)
-{
-    // TODO: 實作開啟檔案時的資料載入邏輯
-    Q_UNUSED(content);
-    Q_UNUSED(type);
-}
-
-QString BaseInfoModule::SaveFile(const QString& content, const QString& type)
-{
-    // TODO: 實作儲存檔案時的資料匯出邏輯
-    Q_UNUSED(content);
-    Q_UNUSED(type);
-    return QString();
-}
-
-void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)
-{
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(mainContentWidget);
-    if (contentEdit) {
-        connect(contentEdit, &QPlainTextEdit::textChanged, this, &BaseInfoModule::onContentChanged);
-        // 初始更新一次
-        onContentChanged();
-    } else {
-        qWarning() << "BaseInfoModule: Failed to connect to main content widget. It is not a QPlainTextEdit.";
-    }
-}
-
-
-// --- 核心邏輯 ---
-
-void BaseInfoModule::loadStopwords()
-{
-    QFile file(":/res/stopwords.json");
+    QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Couldn't open stopwords.json");
+        qWarning() << "Cannot open JSON:" << filename;
         return;
     }
-
     QByteArray data = file.readAll();
-    QJsonDocument doc(QJsonDocument::fromJson(data));
-    QJsonArray array = doc.array();
-
-    for (const QJsonValue &value : array) {
-        m_stopwords.insert(value.toString());
-    }
     file.close();
-}
-
-void BaseInfoModule::onContentChanged()
-{
-    // 從 sender() 獲取文本內容
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(sender());
-    if (!contentEdit) return;
-
-    QString currentText = contentEdit->toPlainText();
-
-    updateWordCount(currentText);
-    updateRecentWords(currentText);
-    updateRedundancy(currentText);
-
-    // 更新最後儲存時間
-    ui->LatestSaveShow->setText(QDateTime::currentDateTime().toString("yyyy.MM.dd hh:mm:ss"));
-}
-
-
-void BaseInfoModule::updateWordCount(const QString& text)
-{
-    ui->TotalWordsVal->setText(QString::number(text.length()));
-}
-
-void BaseInfoModule::updateRecentWords(const QString& text)
-{
-    m_vocabulary.clear();
-    QMap<QString, int> wordCounts;
-    QRegularExpression re("[\\s\\p{P}]"); // 分割符號：空白和標點
-    QStringList words = text.split(re, Qt::SkipEmptyParts);
-
-    for (const QString& word : words) {
-        m_vocabulary.insert(word);
-        wordCounts[word]++;
-    }
-
-    // 更新表格
-    ui->RecentWordsTable->setRowCount(0);
-    for (auto it = wordCounts.constBegin(); it != wordCounts.constEnd(); ++it) {
-        int row = ui->RecentWordsTable->rowCount();
-        ui->RecentWordsTable->insertRow(row);
-        ui->RecentWordsTable->setItem(row, 0, new QTableWidgetItem(it.key()));
-        ui->RecentWordsTable->setItem(row, 1, new QTableWidgetItem(QString::number(it.value())));
-
-        QTableWidgetItem* isStopwordItem = new QTableWidgetItem(m_stopwords.contains(it.key()) ? "是" : "否");
-        ui->RecentWordsTable->setItem(row, 2, isStopwordItem);
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    if (doc.isArray()) {
+        for (const QJsonValue& v : doc.array())
+            targetSet.insert(v.toString());
     }
 }
 
-void BaseInfoModule::updateRedundancy(const QString& text)
+void BaseInfoModule::OpenFile(const QString& content)
 {
-    if (text.isEmpty()) {
-        ui->RedundancyWordsVal->setText("0.00");
-        return;
-    }
+    QDomDocument doc;
+    if (!doc.setContent(content)) return;
+    QDomElement root = doc.documentElement();
+    if (root.tagName() != "BaseInfo") return; // 只處理 BaseInfo
 
-    int stopwordCount = 0;
-    QRegularExpression re("[\\s\\p{P}]");
-    QStringList words = text.split(re, Qt::SkipEmptyParts);
+    // BookName
+    QDomElement bookName = root.firstChildElement("BookName");
+    if (!bookName.isNull()) ui.BookNameEdit->setText(bookName.text());
 
-    for (const QString& word : words) {
-        if (m_stopwords.contains(word)) {
-            stopwordCount++;
+    // Author
+    QDomElement author = root.firstChildElement("AnotherName");
+    if (!author.isNull()) ui.AnotherNameEdit->setText(author.text());
+
+    // StoryType
+    QDomElement storyType = root.firstChildElement("StoryType");
+    if (!storyType.isNull()) ui.StoryTypeEdit->setText(storyType.text());
+
+    // Tags
+    QDomElement tagsElem = root.firstChildElement("Tags");
+    QStringList tagList;
+    for (QDomElement tag = tagsElem.firstChildElement("Tag"); !tag.isNull(); tag = tag.nextSiblingElement("Tag"))
+        tagList << tag.text();
+    QStandardItemModel* tagModel = new QStandardItemModel(tagList.size(), 1, m_widget);
+    for (int i = 0; i < tagList.size(); ++i)
+        tagModel->setItem(i, 0, new QStandardItem(tagList[i]));
+    ui.Tagslist->setModel(tagModel);
+
+    // Intro
+    QDomElement intro = root.firstChildElement("Intro");
+    if (!intro.isNull()) ui.IntroEdit->setPlainText(intro.text());
+
+    // LatestSave
+    QDomElement saveTime = root.firstChildElement("LatestSave");
+    if (!saveTime.isNull()) ui.LatestSaveShow->setText(saveTime.text());
+}
+
+QString BaseInfoModule::SaveFile()
+{
+    QDomDocument doc;
+    QDomElement root = doc.createElement("BaseInfo");
+    doc.appendChild(root);
+
+    // BookName
+    QDomElement bookName = doc.createElement("BookName");
+    bookName.appendChild(doc.createTextNode(ui.BookNameEdit->text()));
+    root.appendChild(bookName);
+
+    // Author
+    QDomElement author = doc.createElement("AnotherName");
+    author.appendChild(doc.createTextNode(ui.AnotherNameEdit->text()));
+    root.appendChild(author);
+
+    // StoryType
+    QDomElement storyType = doc.createElement("StoryType");
+    storyType.appendChild(doc.createTextNode(ui.StoryTypeEdit->text()));
+    root.appendChild(storyType);
+
+    // Tags
+    QDomElement tagsElem = doc.createElement("Tags");
+    QStandardItemModel* tagModel = qobject_cast<QStandardItemModel*>(ui.Tagslist->model());
+    if (tagModel) {
+        for (int i = 0; i < tagModel->rowCount(); ++i) {
+            QDomElement tagElem = doc.createElement("Tag");
+            tagElem.appendChild(doc.createTextNode(tagModel->item(i, 0)->text()));
+            tagsElem.appendChild(tagElem);
         }
     }
+    root.appendChild(tagsElem);
 
-    double totalWords = words.length();
-    double redundancyRate = (totalWords > 0) ? (static_cast<double>(stopwordCount) / totalWords) * 100.0 : 0.0;
-    ui->RedundancyWordsVal->setText(QString::asprintf("%.2f", redundancyRate));
+    // Intro
+    QDomElement intro = doc.createElement("Intro");
+    intro.appendChild(doc.createTextNode(ui.IntroEdit->toPlainText()));
+    root.appendChild(intro);
+
+    // LatestSave
+    QDomElement saveTime = doc.createElement("LatestSave");
+    saveTime.appendChild(doc.createTextNode(ui.LatestSaveShow->text()));
+    root.appendChild(saveTime);
+
+    return doc.toString();
 }
 
-// --- UI 事件處理 ---
-
-void BaseInfoModule::onTagAdd()
+void BaseInfoModule::ImportWords(const QVector<QString>& words, int total, double redundancyPercent, double filterPercent)
 {
-    QString newTag = ui->TagName->text().trimmed();
-    if (!newTag.isEmpty() && !m_tags.contains(newTag)) {
-        m_tags.insert(newTag);
-        m_tagModel->setStringList(QList<QString>::fromSet(m_tags));
-        ui->TagName->clear();
+    m_words = QSet<QString>(words.begin(), words.end());
+    updateRecentWordsTable(words);
+    ui.TotalWordsVal->setText(QString::number(total));
+    ui.RedundancyWordsVal->setText(QString::number(redundancyPercent, 'f', 2));
+    ui.FilterWordsVal->setText(QString::number(filterPercent, 'f', 2));
+}
+
+void BaseInfoModule::updateRecentWordsTable(const QVector<QString>& words)
+{
+    QMap<QString, int> freq;
+    for (const QString& w : words) freq[w]++;
+    auto* model = qobject_cast<QStandardItemModel*>(ui.RecentWordsTable->model());
+    model->removeRows(0, model->rowCount());
+    for (auto it = freq.begin(); it != freq.end(); ++it) {
+        QList<QStandardItem*> row;
+        row << new QStandardItem(it.key());
+        row << new QStandardItem(QString::number(it.value()));
+        row << new QStandardItem(m_redundancySet.contains(it.key()) ? tr("是") : tr("否"));
+        row << new QStandardItem(m_filterSet.contains(it.key()) ? tr("是") : tr("否"));
+        model->appendRow(row);
     }
-}
-
-void BaseInfoModule::onTagDel()
-{
-    QModelIndexList selectedIndexes = ui->Tagslist->selectionModel()->selectedIndexes();
-    if (selectedIndexes.isEmpty()) return;
-
-    QString tagToRemove = selectedIndexes.first().data(Qt::DisplayRole).toString();
-    m_tags.remove(tagToRemove);
-    m_tagModel->setStringList(QList<QString>::fromSet(m_tags));
-}
-
-void BaseInfoModule::onTagSelectionChanged()
-{
-    // 可選：未來可用於篩選等功能
-}
-
-// --- 對外擴充函數實作 ---
-void BaseInfoModule::WordsListImport(const QVector<QString>& lists)
-{
-    for (const QString& word : lists) {
-        m_vocabulary.insert(word);
-    }
-    // TODO: 可以在此處觸發一次列表更新
 }

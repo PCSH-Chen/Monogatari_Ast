@@ -13,6 +13,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_currentChapter(qMakePair(0, 0))
 {
     ui->setupUi(this);
 
@@ -27,6 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
     // 預留 SaveBtn, FindBtn
     // connect(ui->SaveBtn, &QToolButton::clicked, ...);
     // connect(ui->FindBtn, &QToolButton::clicked, ...);
+
+    // 初始化章節管理
+    m_chapterList.append(qMakePair(0, 0));
+    m_chapterLabels.insert(qMakePair(0, 0), "第一章");
 
     // 載入模塊
     loadModules();
@@ -128,6 +133,9 @@ void MainWindow::loadModule(const QString& filePath)
     // 成功載入模塊，創建模塊資訊
     ModuleInfo moduleInfo(module, loader);
     moduleInfos.append(moduleInfo);
+    
+    // 設定模組存取權限
+    setupModuleAccess(module);
 
     qDebug() << "Successfully loaded module:"
              << module->name()
@@ -257,4 +265,54 @@ void MainWindow::onPasteClicked()
 {
     if (ui->Content)
         ui->Content->paste();
+}
+
+// 存取權限介面實作
+QPlainTextEdit* MainWindow::getContentEditor() const
+{
+    return ui->Content;
+}
+
+void MainWindow::setContentAccess(QPlainTextEdit* content)
+{
+    // 這個方法主要用於其他元件設定內容編輯器的引用
+    // 在目前的架構中，我們使用 getContentEditor() 來取得編輯器引用
+    Q_UNUSED(content);
+}
+
+// 章節管理介面實作
+QList<MainWindow::ChapterIdx> MainWindow::getChapterList() const
+{
+    return m_chapterList;
+}
+
+QString MainWindow::getChapterLabel(const ChapterIdx& idx) const
+{
+    return m_chapterLabels.value(idx, QString("章節 %1-%2").arg(idx.first).arg(idx.second));
+}
+
+void MainWindow::setCurrentChapter(const ChapterIdx& idx)
+{
+    if (m_chapterList.contains(idx)) {
+        m_currentChapter = idx;
+        qDebug() << "切換到章節:" << getChapterLabel(idx);
+    }
+}
+
+MainWindow::ChapterIdx MainWindow::getCurrentChapter() const
+{
+    return m_currentChapter;
+}
+
+void MainWindow::setupModuleAccess(ModuleTemplate* module)
+{
+    if (!module) return;
+    
+    // 設定內容編輯器存取權限
+    module->setContentAccess(ui->Content);
+    
+    // 設定章節管理存取權限
+    module->setChapterAccess(this);
+    
+    qDebug() << "設定模組存取權限:" << module->name();
 }

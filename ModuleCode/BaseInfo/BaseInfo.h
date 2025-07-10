@@ -4,8 +4,12 @@
 #include <QWidget>
 #include <QSet>
 #include <QStringListModel>
+#include <QPlainTextEdit>
+#include <QUuid>
 #include "ModuleTemplate.h"
 #include "ui_BaseInfo.h" // 由 uic 自動產生
+
+class MainWindow; // 前向宣告
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BaseInfo; }
@@ -23,12 +27,14 @@ public:
 
     // --- ModuleTemplate 介面實作 ---
     QString name() const override;
-    QString moduleName() const override;
+    QUuid moduleUuid() const override;
+    int priority() const override;
     QIcon icon() const override;
     QWidget* widget() override;
-    void OpenFile(const QString& content, const QString& type) override;
-    QString SaveFile(const QString& content, const QString& type) override;
-    void connectToMainContent(QObject* mainContentWidget) override;
+    void OpenFile(const QString& content) override;
+    QString SaveFile() override;
+    void setContentAccess(QPlainTextEdit* content) override;
+    void setChapterAccess(MainWindow* mainWindow) override;
 
     // --- 對外擴充函數 ---
     void WordsListImport(const QVector<QString>& lists);
@@ -55,6 +61,10 @@ private:
 
     QSet<QString> m_vocabulary;
     QSet<QString> m_stopwords;
+    
+    // 存取權限（新增）
+    QPlainTextEdit* m_contentEditor;
+    MainWindow* m_mainWindow;
 };
 
 #endif // BASEINFOMODULE_H

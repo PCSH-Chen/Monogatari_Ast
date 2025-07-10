@@ -4,6 +4,10 @@
 #include <QIcon>
 #include <QWidget>
 #include <QUuid>
+#include <QPair>
+#include <QPlainTextEdit>
+
+class MainWindow; // 前向宣告
 
 class ModuleTemplate {
 public:
@@ -14,9 +18,13 @@ public:
     virtual QIcon icon() const = 0;             // 64x64 icon
     virtual QWidget* widget() = 0;              // 內容顯示用
 
-    // 如需支援文件操作，下列為純虛函式定義
-    virtual void OpenFile(const QString& content, const QString& type) = 0;
-    virtual QString SaveFile(const QString& content, const QString& type) = 0;
+    // 檔案操作函式（更新的簽名）
+    virtual void OpenFile(const QString& content) = 0;  // 移除 type 參數
+    virtual QString SaveFile() = 0;                     // 移除所有參數
+
+    // 存取權限設定（新增）
+    virtual void setContentAccess(QPlainTextEdit* content) = 0;     // Content 存取
+    virtual void setChapterAccess(MainWindow* mainWindow) = 0;      // Chapter 存取
 };
 
 #define ModuleInterface_iid "org.example.Monogatari.ModuleTemplate"

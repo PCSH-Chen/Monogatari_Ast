@@ -1,0 +1,56 @@
+# Qt build artifacts
+*.o
+*.so
+*.dll
+*.dylib
+*.exe
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+*.qm
+*.prl
+*.pdb
+*.ilk
+*.exp
+*.lib
+.qmake.stash
+Makefile
+Makefile.*
+object_script.*
+moc_predefs.h
+
+# Qt Creator project files
+*.pro.user
+*.pro.user.*
+*.qbs.user
+*.qbs.user.*
+
+# Qt temporary files
+*.moc
+*.rcc
+*.uic
+*.qrc.depends
+*.qmake.cache
+
+# Build directories
+build*/
+debug/
+release/
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Compiled application
+MonogatariAshisutando

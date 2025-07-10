@@ -4,8 +4,11 @@
 #include <QWidget>
 #include <QSet>
 #include <QStringListModel>
+#include <QPlainTextEdit>
 #include "ModuleTemplate.h"
 #include "ui_BaseInfo.h" // 由 uic 自動產生
+
+class MainWindow;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class BaseInfo; }
@@ -14,7 +17,7 @@ QT_END_NAMESPACE
 class BaseInfoModule : public QWidget, public ModuleTemplate
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID ModuleInterface_iid FILE "BaseInfo.json") // 您可以選擇性地使用 JSON 檔案來描述插件元數據
+    Q_PLUGIN_METADATA(IID ModuleInterface_iid)
     Q_INTERFACES(ModuleTemplate)
 
 public:
@@ -23,12 +26,18 @@ public:
 
     // --- ModuleTemplate 介面實作 ---
     QString name() const override;
-    QString moduleName() const override;
+    QUuid moduleUuid() const override;
+    int priority() const override;
     QIcon icon() const override;
     QWidget* widget() override;
-    void OpenFile(const QString& content, const QString& type) override;
-    QString SaveFile(const QString& content, const QString& type) override;
-    void connectToMainContent(QObject* mainContentWidget) override;
+    
+    // 新增：內容和章節存取方法
+    void setContentAccess(QPlainTextEdit* content) override;
+    void setChapterAccess(MainWindow* mainWindow) override;
+    
+    // 檔案操作（已修改）
+    void OpenFile(const QString& content) override;
+    QString SaveFile() override;
 
     // --- 對外擴充函數 ---
     void WordsListImport(const QVector<QString>& lists);
@@ -55,6 +64,10 @@ private:
 
     QSet<QString> m_vocabulary;
     QSet<QString> m_stopwords;
+    
+    // 新增：存取權限
+    QPlainTextEdit* m_contentEditor;
+    MainWindow* m_mainWindow;
 };
 
 #endif // BASEINFOMODULE_H

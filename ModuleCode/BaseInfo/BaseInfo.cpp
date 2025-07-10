@@ -5,9 +5,11 @@
 #include <QPlainTextEdit>
 #include <QDebug>
 #include <QRegularExpression>
+#include <QUuid>
 
 BaseInfoModule::BaseInfoModule(QWidget *parent)
     : QWidget(parent), ui(new Ui::BaseInfo), m_tagModel(new QStringListModel(this))
+    , m_contentEditor(nullptr), m_mainWindow(nullptr)
 {
     ui->setupUi(this);
     setupUI();
@@ -39,36 +41,52 @@ void BaseInfoModule::setupUI()
 // --- ModuleTemplate 介面實作 ---
 
 QString BaseInfoModule::name() const { return "基本資訊"; }
-QString BaseInfoModule::moduleName() const { return "BaseInfo"; }
+
+QUuid BaseInfoModule::moduleUuid() const { 
+    // 為 BaseInfo 模組提供唯一的 UUID
+    return QUuid("{550e8400-e29b-41d4-a716-446655440000}"); 
+}
+
+int BaseInfoModule::priority() const { 
+    return 90; // 高優先級，核心功能模組
+}
+
 QIcon BaseInfoModule::icon() const { return QIcon(); /* 暫時返回空圖示 */ }
 QWidget* BaseInfoModule::widget() { return this; }
 
-void BaseInfoModule::OpenFile(const QString& content, const QString& type)
+void BaseInfoModule::setContentAccess(QPlainTextEdit* content)
+{
+    m_contentEditor = content;
+    if (m_contentEditor) {
+        connect(m_contentEditor, &QPlainTextEdit::textChanged, 
+                this, &BaseInfoModule::onContentChanged);
+        qDebug() << "BaseInfo: Content access set up successfully";
+    }
+}
+
+void BaseInfoModule::setChapterAccess(MainWindow* mainWindow)
+{
+    m_mainWindow = mainWindow;
+    if (m_mainWindow) {
+        // 可以在這裡連接章節相關的信號
+        qDebug() << "BaseInfo: Chapter access set up successfully";
+    }
+}
+
+void BaseInfoModule::OpenFile(const QString& content)
 {
     // TODO: 實作開啟檔案時的資料載入邏輯
     Q_UNUSED(content);
-    Q_UNUSED(type);
+    qDebug() << "BaseInfo: OpenFile called";
 }
 
-QString BaseInfoModule::SaveFile(const QString& content, const QString& type)
+QString BaseInfoModule::SaveFile()
 {
-    // TODO: 實作儲存檔案時的資料匯出邏輯
-    Q_UNUSED(content);
-    Q_UNUSED(type);
-    return QString();
+    // TODO: 實作儲存檔案時的資料序列化邏輯
+    qDebug() << "BaseInfo: SaveFile called";
+    return QString(); // 暫時返回空字串
 }
 
-void BaseInfoModule::connectToMainContent(QObject* mainContentWidget)
-{
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(mainContentWidget);
-    if (contentEdit) {
-        connect(contentEdit, &QPlainTextEdit::textChanged, this, &BaseInfoModule::onContentChanged);
-        // 初始更新一次
-        onContentChanged();
-    } else {
-        qWarning() << "BaseInfoModule: Failed to connect to main content widget. It is not a QPlainTextEdit.";
-    }
-}
 
 
 // --- 核心邏輯 ---
@@ -93,11 +111,13 @@ void BaseInfoModule::loadStopwords()
 
 void BaseInfoModule::onContentChanged()
 {
-    // 從 sender() 獲取文本內容
-    QPlainTextEdit* contentEdit = qobject_cast<QPlainTextEdit*>(sender());
-    if (!contentEdit) return;
+    // 使用新的 m_contentEditor 成員變數
+    if (!m_contentEditor) {
+        qWarning() << "BaseInfo: Content editor not available";
+        return;
+    }
 
-    QString currentText = contentEdit->toPlainText();
+    QString currentText = m_contentEditor->toPlainText();
 
     updateWordCount(currentText);
     updateRecentWords(currentText);
@@ -167,7 +187,8 @@ void BaseInfoModule::onTagAdd()
     QString newTag = ui->TagName->text().trimmed();
     if (!newTag.isEmpty() && !m_tags.contains(newTag)) {
         m_tags.insert(newTag);
-        m_tagModel->setStringList(QList<QString>::fromSet(m_tags));
+        QStringList tagList = QStringList(m_tags.begin(), m_tags.end());
+        m_tagModel->setStringList(tagList);
         ui->TagName->clear();
     }
 }
@@ -179,7 +200,8 @@ void BaseInfoModule::onTagDel()
 
     QString tagToRemove = selectedIndexes.first().data(Qt::DisplayRole).toString();
     m_tags.remove(tagToRemove);
-    m_tagModel->setStringList(QList<QString>::fromSet(m_tags));
+    QStringList tagList = QStringList(m_tags.begin(), m_tags.end());
+    m_tagModel->setStringList(tagList);
 }
 
 void BaseInfoModule::onTagSelectionChanged()

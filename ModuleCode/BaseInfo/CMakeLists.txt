@@ -11,6 +11,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# 添加包含目錄，讓模組能找到 ModuleTemplate.h
+include_directories(../..)
+
 add_library(BaseInfo SHARED
   BaseInfo_global.h
   BaseInfo.cpp

@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QWidget>
 #include <QUuid>
+#include <functional>
 
 class ModuleTemplate {
 public:
@@ -17,6 +18,20 @@ public:
     // 如需支援文件操作，下列為純虛函式定義
     virtual void OpenFile(const QString& content, const QString& type) = 0;
     virtual QString SaveFile(const QString& content, const QString& type) = 0;
+    
+    // Chapter 存取方法 (選擇性實作)
+    virtual void setChapterAccess(
+        std::function<int()> getIdx,
+        std::function<void(int)> setIdx,
+        std::function<QString()> getLabel,
+        std::function<void(const QString&)> setLabel) 
+    {
+        // 預設實作為空，模組可以選擇性覆蓋此方法
+        Q_UNUSED(getIdx);
+        Q_UNUSED(setIdx);
+        Q_UNUSED(getLabel);
+        Q_UNUSED(setLabel);
+    }
 };
 
 #define ModuleInterface_iid "org.example.Monogatari.ModuleTemplate"

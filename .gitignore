@@ -1,0 +1,32 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.pdb
+*.lib
+
+# Qt specific
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+Makefile
+.qmake.stash
+moc_predefs.h
+
+# Binary output
+MonogatariAshisutando
+MonogatariAshisutando.exe
+
+# IDE files
+*.pro.user
+*.pro.user.*
+*.autosave
+
+# Temporary files
+*~
+*.tmp
+*.temp

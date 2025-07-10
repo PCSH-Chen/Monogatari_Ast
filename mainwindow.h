@@ -35,6 +35,16 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // Chapter 相關的存取方法
+    int getChapterIdx() const;
+    void setChapterIdx(int idx);
+    QString getChapterLabel() const;
+    void setChapterLabel(const QString& label);
+
+signals:
+    void chapterIdxChanged(int idx);
+    void chapterLabelChanged(const QString& label);
+
 private slots:
     void onUndoClicked();
     void onRedoClicked();
@@ -55,6 +65,10 @@ private:
     // 成員變數
     Ui::MainWindow *ui;
     QList<ModuleInfo> moduleInfos;  // 模塊資訊列表（包含優先級）
+    
+    // Chapter 相關變數
+    int m_chapterIdx;
+    QString m_chapterLabel;
 };
 
 #endif // MAINWINDOW_H

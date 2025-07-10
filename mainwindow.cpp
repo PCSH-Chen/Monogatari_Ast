@@ -13,6 +13,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_chapterIdx(0)
+    , m_chapterLabel("未命名章節")
 {
     ui->setupUi(this);
 
@@ -177,6 +179,14 @@ void MainWindow::addModulesToSideBar()
 
     for (const ModuleInfo& info : moduleInfos) {
         try {
+            // 設定 Chapter 存取權限
+            info.module->setChapterAccess(
+                [this]() { return getChapterIdx(); },
+                [this](int idx) { setChapterIdx(idx); },
+                [this]() { return getChapterLabel(); },
+                [this](const QString& label) { setChapterLabel(label); }
+            );
+
             // 獲取模塊的 widget
             QWidget* moduleWidget = info.module->widget();
             if (!moduleWidget) {
@@ -257,4 +267,31 @@ void MainWindow::onPasteClicked()
 {
     if (ui->Content)
         ui->Content->paste();
+}
+
+// Chapter 相關方法實作
+int MainWindow::getChapterIdx() const
+{
+    return m_chapterIdx;
+}
+
+void MainWindow::setChapterIdx(int idx)
+{
+    if (m_chapterIdx != idx) {
+        m_chapterIdx = idx;
+        emit chapterIdxChanged(idx);
+    }
+}
+
+QString MainWindow::getChapterLabel() const
+{
+    return m_chapterLabel;
+}
+
+void MainWindow::setChapterLabel(const QString& label)
+{
+    if (m_chapterLabel != label) {
+        m_chapterLabel = label;
+        emit chapterLabelChanged(label);
+    }
 }
